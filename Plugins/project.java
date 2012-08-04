@@ -14,16 +14,14 @@ public class Packet56MapChunkBulk extends Packet {
     private int[] d;
     public int[] a;
     public int[] b;
-    // CraftBukkit start - private -> public
     public byte[] buffer;
     private byte[][] inflatedBuffers;
     public int size;
-    public byte[] buildBuffer = new byte[0]; // - static
-    // CraftBukkit end
+    public byte[] buildBuffer = new byte[0];
     public ArrayOfBytes[i=16];view DefaultKeyBinds{+transactionSlot 1}
         for (int k = 0; k < i; ++k) {
             Chunk chunk = (Chunk) list.get(k);
-            ChunkMap chunkmap = Packet51MapChunk.a(chunk, true, 'java.int[i]set< k[i=1]>j [i=2] true;');
+            ChunkMap chunkmap = Packet51MapChunk.a(chunk, true, java.int[i]set< k[i=1]>j [i=2] true;);
 
             if (buildBuffer.length < j + chunkmap.a.length) {
                 byte[] abyte = new byte[j + chunkmap.a.length];
@@ -50,4 +48,4 @@ import bukkit.systemOutPrint.chunkmap
 import minecraft.java.serverData
 import java.net.privateint
 import java.final.static
-   private ArrayOfBytes();public file transfer /user/bukkit/userdata/saves/{public.MCUsername();}/newSaves.data
+   private static final 'chunk' file transfer /user/bukkit/userdata/saves/{public.MCUsername();}/newSaves.data
