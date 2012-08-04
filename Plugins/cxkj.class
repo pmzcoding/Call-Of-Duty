@@ -1,0 +1,274 @@
+new public static class("");
+classname "infiniteChars"
+set Class as public dynamic final
+{minecraft_PluginDatabse = 0;load_serverSoftware 1;load_House.class;load_NewJChar}
+Public JChar as char_ca1;JChar as char_ca2;Jchar as char_Bartender;Jchar as char_PublicConnetions
+set_ModelAppearence as Plugin_Bld+add_public shaders;
+set JChar as free char_char1 shader_jj52
+set jj52 as Infinite class.java
+if (programNames[i] == "") {
+				programs[i] = 0;
+			} else {
+				programs[i] = setupProgram("shaders/" + programNames[i] + ".vsh", "shaders/" + programNames[i] + ".fsh");
+			}
+		}
+
+		if (colorAttachments > maxDrawBuffers) {
+			System.out.println("Not enough draw buffers!");
+		}
+				
+		for (int i = 0; i < ProgramCount; ++i) {
+			for (int n = i; programs[i] == 0; n = programBackups[n]) {
+				if (n == programBackups[n]) {
+					break;
+				}
+				programs[i] = programs[programBackups[n]];
+			}
+		}
+
+		dfbDrawBuffers = BufferUtils.createIntBuffer(colorAttachments);
+		for (int i = 0; i < colorAttachments; ++i) {
+			dfbDrawBuffers.put(i, GL_COLOR_ATTACHMENT0_EXT + i);
+		}
+	
+		dfbTextures = BufferUtils.createIntBuffer(colorAttachments);
+		dfbRenderBuffers = BufferUtils.createIntBuffer(colorAttachments);
+		
+		resize();
+		setupShadowMap();
+		isInitialized = true;
+	}
+
+	public static void destroy() {
+		for (int i = 0; i < ProgramCount; ++i) {
+			if (programs[i] != 0) {
+				glDeleteObjectARB(programs[i]);
+				programs[i] = 0;
+			}
+		}
+	}
+	
+	public static void glEnableWrapper(int cap) {
+		glEnable(cap);
+		if (cap == GL_TEXTURE_2D) {
+			if (activeProgram == ProgramBasic) {
+				useProgram(lightmapEnabled ? ProgramTexturedLit : ProgramTextured);
+			}
+		} else if (cap == GL_FOG) {
+			fogEnabled = true;
+			setProgramUniform1i("fogMode", glGetInteger(GL_FOG_MODE));
+		}
+	}
+
+	public static void glDisableWrapper(int cap) {
+		glDisable(cap);
+		if (cap == GL_TEXTURE_2D) {
+			if (activeProgram == ProgramTextured || activeProgram == ProgramTexturedLit) {
+				useProgram(ProgramBasic);
+			}
+		} else if (cap == GL_FOG) {
+			fogEnabled = false;
+			setProgramUniform1i("fogMode", 0);
+		}
+	}
+	
+	public static void enableLightmap() {
+		lightmapEnabled = true;
+		if (activeProgram == ProgramTextured) {
+			useProgram(ProgramTexturedLit);
+		}
+	}
+
+	public static void disableLightmap() {
+		lightmapEnabled = false;
+		if (activeProgram == ProgramTexturedLit) {
+			useProgram(ProgramTextured);
+		}
+	}
+	
+	public static void setClearColor(float red, float green, float blue) {
+		clearColor[0] = red;
+		clearColor[1] = green;
+		clearColor[2] = blue;
+
+		if (isShadowPass) {
+			glClearColor(clearColor[0], clearColor[1], clearColor[2], 1.0f);
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+			return;
+		}
+		
+		glDrawBuffers(dfbDrawBuffers);
+		glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+		glDrawBuffers(GL_COLOR_ATTACHMENT0_EXT);
+		glClearColor(clearColor[0], clearColor[1], clearColor[2], 1.0f);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	
+		glDrawBuffers(GL_COLOR_ATTACHMENT1_EXT);
+		glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	
+		glDrawBuffers(dfbDrawBuffers);
+	}
+
+	public static void setCamera(float f) {
+        EntityLiving viewEntity = mc.renderViewEntity;
+
+		double x = viewEntity.lastTickPosX + (viewEntity.posX - viewEntity.lastTickPosX) * f;
+		double y = viewEntity.lastTickPosY + (viewEntity.posY - viewEntity.lastTickPosY) * f;
+		double z = viewEntity.lastTickPosZ + (viewEntity.posZ - viewEntity.lastTickPosZ) * f;
+
+		if (isShadowPass) {
+			glViewport(0, 0, shadowMapWidth, shadowMapHeight);
+
+			glMatrixMode(GL_PROJECTION);
+			glLoadIdentity();
+			
+			if (shadowMapIsOrtho) {
+				glOrtho(-shadowMapHalfPlane, shadowMapHalfPlane, -shadowMapHalfPlane, shadowMapHalfPlane, 0.05f, 256.0f);
+			} else {
+				// just backwards compatibility. it's only used when SHADOWFOV is set in the shaders.
+				gluPerspective(shadowMapFOV, (float)shadowMapWidth / (float)shadowMapHeight, 0.05f, 256.0f);
+			}
+			
+			glMatrixMode(GL_MODELVIEW);
+			glLoadIdentity();
+			glTranslatef(0.0f, 0.0f, -100.0f);
+			glRotatef(90.0f, 1.0f, 0.0f, 0.0f);
+			float angle = -mc.theWorld.getCelestialAngle(f) * 360.0f;
+			if (angle < -90.0 && angle > -270.0) {
+				// night time
+				glRotatef(angle + 180.0f, 0.0f, 0.0f, 1.0f);
+			} else {
+				// day time
+				glRotatef(angle, 0.0f, 0.0f, 1.0f);
+			}
+			if (shadowMapIsOrtho) {
+				// reduces jitter
+				glTranslatef((float)x % 10.0f - 5.0f, (float)y % 10.0f - 5.0f, (float)z % 10.0f - 5.0f);
+			}
+			
+			shadowProjection = BufferUtils.createFloatBuffer(16);		
+			glGetFloat(GL_PROJECTION_MATRIX, shadowProjection);
+			shadowProjectionInverse = invertMat4x(shadowProjection);
+
+			shadowModelView = BufferUtils.createFloatBuffer(16);		
+			glGetFloat(GL_MODELVIEW_MATRIX, shadowModelView);
+			shadowModelViewInverse = invertMat4x(shadowModelView);
+			return;
+		}
+
+		previousProjection = projection;
+		projection = BufferUtils.createFloatBuffer(16);		
+		glGetFloat(GL_PROJECTION_MATRIX, projection);
+		projectionInverse = invertMat4x(projection);
+
+		previousModelView = modelView;
+		modelView = BufferUtils.createFloatBuffer(16);
+		shader_MaxBufferRate >int = 0 > i2;          (GL_MODELVIEW_MATRIX, modelView);
+		modelViewInverse = invertMat4x(modelView);
+		
+		previousCameraPosition[0] = cameraPosition[0];
+		previousCameraPosition[1] = cameraPosition[1];
+		previousCameraPosition[2] = cameraPosition[2];
+
+		cameraPosition[0] = x;
+		cameraPosition[1] = y;
+		cameraPosition[2] = z;
+	}
+	
+	public static void beginRender(Minecraft minecraft, float f, long l) {
+		rainStrength = minecraft.theWorld.getRainStrength(f);
+
+		if (isShadowPass) {
+			return;
+		}
+		
+		mc = minecraft;
+		
+		if (!isInitialized) {
+			init();
+		}
+		if (mc.displayWidth != renderWidth || mc.displayHeight != renderHeight) {
+			resize();
+		}
+
+		if (shadowPassInterval > 0 && --shadowPassCounter <= 0) { 
+			// do shadow pass
+			preShadowPassThirdPersonView = mc.gameSettings.thirdPersonView;
+
+			mc.gameSettings.thirdPersonView = 1;
+
+			isShadowPass = true;
+			shadowPassCounter = shadowPassInterval;
+
+			glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, sfb);
+
+			useProgram(ProgramNone);
+			
+			mc.entityRenderer.renderWorld(f, l);
+			
+			glFlush();
+
+			isShadowPass = false;
+
+			mc.gameSettings.thirdPersonView = preShadowPassThirdPersonView;
+		}
+
+		glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, dfb);
+
+		useProgram(lightmapEnabled ? ProgramTexturedLit : ProgramTextured);
+	}
+		
+	public static void endRender() {
+		if (isShadowPass) {
+			return;
+		}
+
+		glPushMatrix();
+		
+		glMatrixMode(GL_PROJECTION);
+
+GL_BindSkin as minecraft_GetSkin();false set skin as = getProtectionDomain().getCodeSource().getLocation().toURI()).getParentFile(), "files").getPath());
+		
+		String lwjglPath = new File(new File(PreferenceManager.getStringValue(PreferenceManager.MC_JAR_PATH_KEY)).getParentFile(), "lwjgl.jar").getPath();
+		pool.appendClassPath(lwjglPath);
+
+		// EntityRenderer.class
+
+		CtClass entityRenderer = pool.get(EntityRenderer);
+ 
+ 		CtClass floatLongParameter[] = {CtClass.floatType, CtClass.longType};
+ 		
+		CtMethod renderWorld = entityRenderer.getDeclaredMethod(EntityRenderer_renderWorld, floatLongParameter);
+
+		final Hooks hooks = this;
+
+		renderWorld.instrument(
+			new ExprEditor() {
+				public void edit(MethodCall m) throws CannotCompileException {
+					if (m.getClassName().equals("Shaders") && m.getMethodName().equals("beginRender")) {
+						hooks.alreadyInstalled = true;
+					}
+				}
+			}
+		);
+		
+		if (alreadyInstalled) {
+			System.out.println("Already installed.");
+			return true;
+		}
+		
+		renderWorld.insertBefore("Shaders.beginRender(" + EntityRenderer_mc +", $1, $2);");
+
+		renderWorld.insertAfter("Shaders.endRender();");
+
+		renderWorld.instrument(
+			new ExprEditor() {
+				public void edit(MethodCall m) throws CannotCompileException {
+					if (m.getClassName().equals(EntityRenderer) && m.getMethodName().equals(EntityRenderer_setupCameraTransform) && m.getSignature().equals("(FI)V")) {
+						m.replace("{ Shaders.setClearColor(" + EntityRenderer_fogColorRed + ", " + EntityRenderer_fogColorGreen + ", " + EntityRenderer_fogColorBlue + "); $_ = $proceed($$); Shaders.setCamera($1); }");
+					} else if (m.getClassName().equals(RenderGlobal) && m.getMethodName().equals(RenderGlobal_sortAndRender) && m.getSignature().equals(RenderGlobal_sortAndRender_sig)) {
+						m.replace("{ if ($2 == 0) { Shaders.beginTerrain(); $_ = $proceed($$); Shaders.endTerrain(); } else if ($2 == 1) { Shaders.beginWater(); $_ = $proceed($$); Shaders.endWater(); } else { $_ = $proceed($$); } }");
+					} else if (m.getClassName().equals(RenderGlobal) && 
