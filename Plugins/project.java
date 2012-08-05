@@ -36,6 +36,8 @@ public class Packet56MapChunkBulk extends Packet {
             this.d[k] = chunk.z;
             this.a[k] = chunkmap.b;
             this.b[k] = chunkmap.c;
+            this.xyz[int] = chunk.getCoords.xyz;
+            this.int.get package; import savefrom = chunk.save k[i=x]>j+new package;
             this.inflatedBuffers[k] = chunkmap.a;
         }
             this.secondPackage[i=chunk.aBind Username;grabDefaultSettings+account.adata;allow.packageChunkUpdates;give.minecraft java;+arrayOfBytes]
