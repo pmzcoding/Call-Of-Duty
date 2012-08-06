@@ -52,7 +52,7 @@ import java.net.privateint
 import java.final.static
 
 private class host extends resolves hostname;
-    public static java.plugin "PMzAntiCheat"
+    public static java.plugin PMzAntiCheat else public.final extends zBuffering
         set java.public.static int = k[i]>j=1;
     plugindata fromUserc:-hosts-BukkitDev-plugins-loader-CMVM-filetransfer.exe
         transfer.from.ip=elitehosting.sytes.net to java.class grab hostnamefrom=minecraftHost
