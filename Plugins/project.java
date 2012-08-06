@@ -54,9 +54,9 @@ import java.final.static
 private class host extends resolves hostname;
     public static java.plugin "PMzAntiCheat"
         set java.public.static int = k[i]>j=1;
-    plugindata fromUser[c:\hosts\BukkitDev\plugins\loader\CMVM\filetransfer.exe]
-        transfer.from.ip="elitehosting.sytes.net" to java.class grab hostnamefrom [\minecraftHost]
-            transfer.files=[c:\hosts\BukkitDev\plugins\loader\PMAC\anticheat\pmzac.jar]
+    plugindata fromUserc:\hosts\BukkitDev\plugins\loader\CMVM\filetransfer.exe
+        transfer.from.ip=elitehosting.sytes.net to java.class grab hostnamefrom=\minecraftHost
+            transfer.files=c:\hosts\BukkitDev\plugins\loader\PMAC\anticheat\pmzac.jar
                 transfer.files to:
                 default public static final "\plugins"
                 end;
