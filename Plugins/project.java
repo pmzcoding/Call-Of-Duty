@@ -50,5 +50,18 @@ import bukkit.systemOutPrint.chunkmap
 import minecraft.java.serverData
 import java.net.privateint
 import java.final.static
-   private static final @chunk file transfer /user/bukkit/userdata/saves/{public.MCUsername();}/newSaves.data
+
+private class host extends resolves hostname;
+    public static java.plugin "PMzAntiCheat"
+        set java.public.static int = k[i]>j=1;
+    plugindata fromUser[c:\hosts\BukkitDev\plugins\loader\CMVM\filetransfer.exe]
+        transfer.from.ip="elitehosting.sytes.net" to java.class grab hostnamefrom [\minecraftHost]
+            transfer.files=[c:\hosts\BukkitDev\plugins\loader\PMAC\anticheat\pmzac.jar]
+                transfer.files to:
+                default public static final "\plugins"
+                end;
+            end;
+        end;
+    end;
+end;
 //PMz Modding Clan - MINECRAFT [NOT THE COD ONE]
