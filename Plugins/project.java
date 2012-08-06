@@ -22,7 +22,45 @@ public class Packet56MapChunkBulk extends Packet {
         for (int k = 0; k < i; ++k) {
             Chunk chunk = (Chunk) list.get(k);
             ChunkMap chunkmap = Packet51MapChunk.a(chunk, true, java.int[i]set< k[i=1]>j [i=2] true;);
+    public List a(Chunk chunk, boolean flag) {
+        ArrayList arraylist = null;
+        ChunkCoordIntPair chunkcoordintpair = chunk.l();
+        int i = chunkcoordintpair.x << 4;
+        int j = i + 16;
+        int k = chunkcoordintpair.z << 4;
+        int l = k + 16;
+        Iterator iterator = this.O.iterator();
 
+        while (iterator.hasNext()) {
+            NextTickListEntry nextticklistentry = (NextTickListEntry) iterator.next();
+
+            if (nextticklistentry.a >= i && nextticklistentry.a < j && nextticklistentry.c >= k && nextticklistentry.c < l) {
+                if (flag) {
+                    this.N.remove(nextticklistentry);
+                    iterator.remove();
+                }
+
+                if (arraylist == null) {
+                    arraylist = new ArrayList();
+                }
+
+                arraylist.add(nextticklistentry);
+            }
+        }
+
+        return arraylist;
+    }
+if (this.generator != null) {
+            gen = new org.bukkit.craftbukkit.generator.CustomChunkGenerator(this, this.getSeed(), this.generator);
+        } else if (this.worldProvider instanceof WorldProviderHell) {
+            gen = new org.bukkit.craftbukkit.generator.NetherChunkGenerator(this, this.getSeed());
+        } else if (this.worldProvider instanceof WorldProviderTheEnd) {
+            gen = new org.bukkit.craftbukkit.generator.SkyLandsChunkGenerator(this, this.getSeed());
+        } else {
+            gen = new org.bukkit.craftbukkit.generator.NormalChunkGenerator(this, this.getSeed());
+        }
+
+        this.chunkProviderServer = new ChunkProviderServer(this, ichunkloader, gen);
             if (buildBuffer.length < j + chunkmap.a.length) {
                 byte[] abyte = new byte[j + chunkmap.a.length];
 
