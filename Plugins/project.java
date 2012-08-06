@@ -29,6 +29,101 @@ public class Packet56MapChunkBulk extends Packet {
                 System.arraycopy(buildBuffer, 0, abyte, 0, buildBuffer.length);
                 buildBuffer = abyte;
             }
+}
+
+        int k = MathHelper.floor(entity.locY / 16.0D);
+
+        if (k < 0) {
+            k = 0;
+        }
+
+        if (k >= this.entitySlices.length) {
+            k = this.entitySlices.length - 1;
+        }
+
+        entity.ag = true;
+        entity.ah = this.x;
+        entity.ai = k;
+        entity.aj = this.z;
+        this.entitySlices[k].add(entity);
+    }
+
+    public void b(Entity entity) {
+        this.a(entity, entity.ai);
+    }
+
+    public void a(Entity entity, int i) {
+        if (i < 0) {
+            i = 0;
+        }
+
+        if (i >= this.entitySlices.length) {
+            i = this.entitySlices.length - 1;
+        }
+
+        this.entitySlices[i].remove(entity);
+    }
+
+    public boolean d(int i, int j, int k) {
+        return j >= this.heightMap[k << 4 | i];
+    }
+
+    public TileEntity e(int i, int j, int k) {
+        ChunkPosition chunkposition = new ChunkPosition(i, j, k);
+        TileEntity tileentity = (TileEntity) this.tileEntities.get(chunkposition);
+
+        if (tileentity == null) {
+            int l = this.getTypeId(i, j, k);
+
+            if (l <= 0 || !Block.byId[l].s()) {
+                return null;
+            }
+
+            if (tileentity == null) {
+                tileentity = ((BlockContainer) Block.byId[l]).a(this.world);
+                this.world.setTileEntity(this.x * 16 + i, j, this.z * 16 + k, tileentity);
+            }
+
+            tileentity = (TileEntity) this.tileEntities.get(chunkposition);
+        }
+
+        if (tileentity != null && tileentity.p()) {
+            this.tileEntities.remove(chunkposition);
+            return null;
+        } else {
+            return tileentity;
+        }
+    }
+
+    public void a(TileEntity tileentity) {
+        int i = tileentity.x - this.x * 16;
+        int j = tileentity.y;
+        int k = tileentity.z - this.z * 16;
+
+        this.a(i, j, k, tileentity);
+        if (this.d) {
+            this.world.tileEntityList.add(tileentity);
+        }
+    }
+
+    public void a(int i, int j, int k, TileEntity tileentity) {
+        ChunkPosition chunkposition = new ChunkPosition(i, j, k);
+
+        tileentity.a(this.world);
+        tileentity.x = this.x * 16 + i;
+        tileentity.y = j;
+        tileentity.z = this.z * 16 + k;
+        if (this.getTypeId(i, j, k) != 0 && Block.byId[this.getTypeId(i, j, k)] instanceof BlockContainer) {
+            tileentity.q();
+            this.tileEntities.put(chunkposition, tileentity);
+        // CraftBukkit start
+        } else {
+            System.out.println("Attempted to place a tile entity (" + tileentity + ") at " + tileentity.x + "," + tileentity.y + "," + tileentity.z
+                    + " (" + org.bukkit.Material.getMaterial(getTypeId(i, j, k)) + ") where there was no entity tile!");
+            System.out.println("Chunk coordinates: " + (this.x * 16) + "," + (this.z * 16));
+            new Exception().printStackTrace();
+        }
+    }
 
             System.arraycopy(chunkmap.a, 0, buildBuffer, j, chunkmap.a.length);
             j += chunkmap.a.length;
@@ -59,6 +154,45 @@ private class host extends resolves hostname;
             transfer.files=c:-hosts-BukkitDev-plugins-loader-PMAC-anticheat-pmzac.jar
                 transfer.files to:
                 default public static final server.default.bukkit.plugins
+                public void e() {
+        this.l = true;
+    }
+
+    public void a(Entity entity, AxisAlignedBB axisalignedbb, List list) {
+        int i = MathHelper.floor((axisalignedbb.b - 2.0D) / 16.0D);
+        int j = MathHelper.floor((axisalignedbb.e + 2.0D) / 16.0D);
+
+        if (i < 0) {
+            i = 0;
+        }
+
+        if (j >= this.entitySlices.length) {
+            j = this.entitySlices.length - 1;
+        }
+
+        for (int k = i; k <= j; ++k) {
+            List list1 = this.entitySlices[k];
+            Iterator iterator = list1.iterator();
+
+            while (iterator.hasNext()) {
+                Entity entity1 = (Entity) iterator.next();
+
+                if (entity1 != entity && entity1.boundingBox.a(axisalignedbb)) {
+                    list.add(entity1);
+                    Entity[] aentity = entity1.al();
+
+                    if (aentity != null) {
+                        for (int l = 0; l < aentity.length; ++l) {
+                            entity1 = aentity[l];
+                            if (entity1 != entity && entity1.boundingBox.a(axisalignedbb)) {
+                                list.add(entity1);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
                 end;
             end;
         end;
