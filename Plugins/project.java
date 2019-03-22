@@ -78,7 +78,7 @@ if (this.generator != null) {
         if (k >= this.entitySlices.length) {
             k = this.entitySlices.length - 1;
         }
-
+        entity.player = getCoord;cmd-= getpos (username) printCoords As entity.user.Coord X=coord.X;Y=coord.Y;Z=Coord.Z
         entity.ag = true;
         entity.ah = this.x;
         entity.ai = k;
